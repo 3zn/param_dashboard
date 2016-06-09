@@ -1,0 +1,81 @@
+---
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+params:
+ sub: "1001"
+ name: "hoge"
+---
+
+---
+title: `r params$name`
+---
+
+
+```{r setup, include=FALSE}
+# Load packages and initialize data here
+library(flexdashboard)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+df <- read.csv("data.csv")
+data <- filter(df, no==params$sub)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### 達成率
+
+```{r}
+gauge(round(data$y1*100,1), min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(80, 100), warning = c(40, 79), danger = c(0, 39)
+))
+```
+
+### 好感度
+
+```{r}
+gauge(round(data$y2*100,1), min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(80, 100), warning = c(40, 79), danger = c(0, 39)
+))
+```
+
+### 次のレベルまで
+
+```{r}
+gauge(round(data$y3*100,1), min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(80, 100), warning = c(40, 79), danger = c(0, 39)
+))
+```
+
+Row
+-----
+
+### ステータス
+
+```{r}
+d_s <- data %>% 
+  select(a1:a3) %>% 
+  gather(key=var, value=val)
+ggplot(d_s, aes(x=var, y=val)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  ylim(0, 100) +
+  xlab("")
+```
+
+### スキルレベル
+
+```{r}
+d_sl <- data %>% 
+  select(x1:x4) %>% 
+  gather(key=var, value=val)
+ggplot(d_sl, aes(x=var, y=val)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  ylim(0, 10) +
+  xlab("")
+```
+
